@@ -1,4 +1,7 @@
+var request = require('request-promise');
+
 const data = require('./data/city.list.json')
+const config = require('./config.js')
 
 async function searchCityName(ctx, next) {
     const str = ctx.request.query.city;
@@ -18,6 +21,24 @@ async function searchCityName(ctx, next) {
     ctx.body = filteredData
 }
 
+
+async function getWeather(ctx, next){
+
+    let params = {
+        APPID : config.weatherApiKey,
+    }
+    params = Object.assign(params,ctx.request.query)
+
+    await request({
+        uri : 'https://api.openweathermap.org/data/2.5/weather',
+        qs: params
+    },(err,resp,body)=>{
+        console.log(err,resp,body);
+        ctx.body = body;
+    })
+}
+
 module.exports = {
-    searchCityName : searchCityName
+    searchCityName : searchCityName,
+    getWeather : getWeather
 }
