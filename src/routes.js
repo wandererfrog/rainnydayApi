@@ -25,50 +25,54 @@ async function searchCityName(ctx, next) {
     ctx.body = filteredData
 }
 
-
-async function getWeather(ctx, next){
-
+async function getWeatherData(ctx,next){
     let params = {
         APPID : config.weatherApiKey,
     }
     params = Object.assign(params,ctx.request.query)
 
-    await request({
-        uri : 'https://api.openweathermap.org/data/2.5/weather',
-        qs: params
-    },(err,resp,body)=>{
-        // console.log(err,resp,body);
-        ctx.body = body;
-    })
-}
-
-async function getForecast(ctx, next){
-    let params = {
-        APPID : config.weatherApiKey,
-    }
-    params = Object.assign(params,ctx.request.query)
-
-    await request({
+    const forecastData = await request({
         uri : 'https://api.openweathermap.org/data/2.5/forecast',
         qs: params
     },(err,resp,body)=>{
-        const jsonBody = JSON.parse(body)
-        prepareWeekForecastData(jsonBody)
-        ctx.body = body;
+        // console.log(err,resp,body); //TODO: deal with error
+        return body;
     })
+
+    const currentData = await request({
+        uri : 'https://api.openweathermap.org/data/2.5/weather',
+        qs: params
+    },(err,resp,body)=>{
+        // console.log(err,resp,body); //TODO: deal with error
+        return body;
+    })
+
+    const body = await prepareWeatherData(JSON.parse(currentData),JSON.parse(forecastData))
+    ctx.body = body
 }
 
-async function prepareWeekForecastData(data){
-    // let startDate = new Date(data['dt_txt']);
-    let forecastData = {};
+
+async function prepareWeatherData(current,forecast){
+    const MAX_GRAPH_POINTS = 8 // 8 * 3h = 24h
+
+    let weatherData = {
+        current : current,
+        forecast : {},
+        graph : []
+    };
 
     try{
-        await data.list.forEach( async (el)=>{
+        // Get forecast for week
+        await forecast.list.forEach( async (el,idx)=>{
+
+            if(idx < MAX_GRAPH_POINTS)
+                weatherData.graph.push(el)
+
             let date = new Date(el['dt_txt'])
             let key = `${date.getDate()}/${date.getMonth()+1}`
     
-            if(!forecastData[key])
-                forecastData[key] = {
+            if(!weatherData.forecast[key])
+                weatherData.forecast[key] = {
                     name : getWeekDayName(date.getDay()),
                     temps : [],
                     min : null,
@@ -76,19 +80,22 @@ async function prepareWeekForecastData(data){
                     avg : null
                 }
                 
-            forecastData[key].temps.push({
+            weatherData.forecast[key].temps.push({
                 temp : el.main.temp,
                 date : date
             })
-            
-            await Object.keys(forecastData).forEach(async (key)=>{
-                forecastData[key].avg = await getAverageTemp(forecastData[key].temps);
-                forecastData[key].min = await getMinTemp(forecastData[key].temps);
-                forecastData[key].max = await getMaxTemp(forecastData[key].temps);
-            })
-
-            console.log(forecastData)    
+            try{
+                await Object.keys(weatherData.forecast).forEach(async (key)=>{
+                    weatherData.forecast[key].avg = await getAverageTemp(weatherData.forecast[key].temps);
+                    weatherData.forecast[key].min = await getMinTemp(weatherData.forecast[key].temps);
+                    weatherData.forecast[key].max = await getMaxTemp(weatherData.forecast[key].temps);
+                })    
+            }catch(exception){
+                log.error(exception)
+                return {}
+            }
         })
+        return weatherData;
     }catch(exception){
         console.error(exception);
         return {};
@@ -99,6 +106,5 @@ async function prepareWeekForecastData(data){
 
 module.exports = {
     searchCityName : searchCityName,
-    getWeather : getWeather,
-    getForecast : getForecast
+    getWeatherData : getWeatherData
 }

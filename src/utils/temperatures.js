@@ -11,8 +11,7 @@ async function getAverageTemp(list){
 
 async function getMaxTemp(list){
     try{
-        const max = Math.max(list.map( temp => temp.temp))
-        return max
+        return Math.max(...list.map( temp => (temp.temp)))
     }catch(exception){
         console.error(exception);
         return null;
@@ -21,7 +20,7 @@ async function getMaxTemp(list){
 
 async function getMinTemp(list){
     try{
-        return Math.min(list.map( temp => temp.temp))
+        return Math.min(...list.map( temp => (temp.temp)))
     }catch(exception){
         console.error(exception);
         return null;
