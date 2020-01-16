@@ -64,7 +64,6 @@ async function prepareWeatherData(current,forecast){
     try{
         // Get forecast for week
         await forecast.list.forEach( async (el,idx)=>{
-
             if(idx < MAX_GRAPH_POINTS)
                 weatherData.graph.push(el)
 
@@ -84,24 +83,21 @@ async function prepareWeatherData(current,forecast){
                 temp : el.main.temp,
                 date : date
             })
-            try{
-                await Object.keys(weatherData.forecast).forEach(async (key)=>{
-                    weatherData.forecast[key].avg = await getAverageTemp(weatherData.forecast[key].temps);
-                    weatherData.forecast[key].min = await getMinTemp(weatherData.forecast[key].temps);
-                    weatherData.forecast[key].max = await getMaxTemp(weatherData.forecast[key].temps);
-                })    
-            }catch(exception){
-                log.error(exception)
-                return {}
-            }
         })
-        return weatherData;
-    }catch(exception){
-        console.error(exception);
-        return {};
-    }
-    
+        
+        await Object.keys(weatherData.forecast).forEach(async (key)=>{
+                const temperatureSet = weatherData.forecast[key].temps; 
+                let [max,min,avg] = await Promise.all([getMaxTemp(temperatureSet), getMinTemp(temperatureSet), getAverageTemp(temperatureSet)]);
+                weatherData.forecast[key].max = max
+                weatherData.forecast[key].avg = avg
+                weatherData.forecast[key].min = min
+            })    
+        }catch(exception){
+            log.error(exception)
+            return {}
+        }
 
+        return weatherData;
 }
 
 module.exports = {
