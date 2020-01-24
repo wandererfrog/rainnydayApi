@@ -4,7 +4,6 @@ const {getWeekDayName} = require('./utils/dates')
 const {getAverageTemp,getMinTemp,getMaxTemp} = require('./utils/temperatures')
 
 const data = require('./data/city.list.json')
-const config = require('./config.js')
 
 
 async function searchCityName(ctx, next) {
@@ -27,7 +26,7 @@ async function searchCityName(ctx, next) {
 
 async function getWeatherData(ctx,next){
     let params = {
-        APPID : config.weatherApiKey,
+        APPID : process.env.API_KEY,
     }
     params = Object.assign(params,ctx.request.query)
 
