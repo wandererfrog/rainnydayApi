@@ -11,7 +11,6 @@ async function getAverageTemp(list){
 
 async function getMaxTemp(list){
     try{
-        //console.log(Math.max(...list.map( temp => (temp.temp))))
         return await Math.max(...list.map( temp => (temp.temp)))
     }catch(exception){
         console.error(exception);

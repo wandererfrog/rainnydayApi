@@ -5,7 +5,7 @@ const {getAverageTemp,getMinTemp,getMaxTemp} = require('./utils/temperatures')
 
 const data = require('./data/city.list.json')
 
-
+// We filter down to only 60 results.
 async function searchCityName(ctx, next) {
     const str = ctx.request.query.city;
     if(!str){
