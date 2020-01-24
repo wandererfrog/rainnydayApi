@@ -4,9 +4,8 @@ const {getWeekDayName} = require('./utils/dates')
 const {getAverageTemp,getMinTemp,getMaxTemp} = require('./utils/temperatures')
 
 const data = require('./data/city.list.json')
-const config = require('./config.js')
 
-
+// We filter down to only 60 results.
 async function searchCityName(ctx, next) {
     const str = ctx.request.query.city;
     if(!str){
@@ -27,7 +26,7 @@ async function searchCityName(ctx, next) {
 
 async function getWeatherData(ctx,next){
     let params = {
-        APPID : config.weatherApiKey,
+        APPID : process.env.API_KEY,
     }
     params = Object.assign(params,ctx.request.query)
 
@@ -35,7 +34,11 @@ async function getWeatherData(ctx,next){
         uri : 'https://api.openweathermap.org/data/2.5/forecast',
         qs: params
     },(err,resp,body)=>{
-        // console.log(err,resp,body); //TODO: deal with error
+        if(err){
+            console.error(err,resp);
+            return null;
+        }
+
         return body;
     })
 
@@ -43,7 +46,10 @@ async function getWeatherData(ctx,next){
         uri : 'https://api.openweathermap.org/data/2.5/weather',
         qs: params
     },(err,resp,body)=>{
-        // console.log(err,resp,body); //TODO: deal with error
+        if(err){
+            console.error(err,resp);
+            return null;
+        }
         return body;
     })
 
@@ -100,7 +106,12 @@ async function prepareWeatherData(current,forecast){
         return weatherData;
 }
 
+function healthy(ctx, next) {
+    ctx.body = "Healthy"
+}
+
 module.exports = {
     searchCityName : searchCityName,
-    getWeatherData : getWeatherData
+    getWeatherData : getWeatherData,
+    healthy : healthy
 }
