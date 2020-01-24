@@ -16,5 +16,5 @@ app.use(cors({ options : {origin : '*'} }))
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-console.info("Starting server at port: "+process.env.API_PORT);
-app.listen(process.env.API_PORT);
+console.info("Starting server at port: "+process.env.PORT);
+app.listen(process.env.PORT);
