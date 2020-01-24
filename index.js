@@ -17,4 +17,4 @@ app.use(router.routes());
 app.use(router.allowedMethods());
 
 console.info("Starting server at port: "+process.env.PORT);
-app.listen(port);
+app.listen(process.env.PORT);
