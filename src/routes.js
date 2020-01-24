@@ -99,7 +99,12 @@ async function prepareWeatherData(current,forecast){
         return weatherData;
 }
 
+function healthy(ctx, next) {
+    ctx.body = "Healthy"
+}
+
 module.exports = {
     searchCityName : searchCityName,
-    getWeatherData : getWeatherData
+    getWeatherData : getWeatherData,
+    healthy : healthy
 }
