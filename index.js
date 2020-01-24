@@ -7,9 +7,6 @@ const app = new Koa();
 const router = new Router();
 
 router.get('/v1/search', searchCityName);
-
-// router.get('/v1/weather/',getWeather);
-// router.get('/v1/forecast/',getForecast);
 router.get('/v1/weather/',getWeatherData)
 
 app.use(cors({ options : {origin : '*'} }))
