@@ -34,7 +34,11 @@ async function getWeatherData(ctx,next){
         uri : 'https://api.openweathermap.org/data/2.5/forecast',
         qs: params
     },(err,resp,body)=>{
-        // console.log(err,resp,body); //TODO: deal with error
+        if(err){
+            console.error(err,resp);
+            return null;
+        }
+
         return body;
     })
 
@@ -42,7 +46,10 @@ async function getWeatherData(ctx,next){
         uri : 'https://api.openweathermap.org/data/2.5/weather',
         qs: params
     },(err,resp,body)=>{
-        // console.log(err,resp,body); //TODO: deal with error
+        if(err){
+            console.error(err,resp);
+            return null;
+        }
         return body;
     })
 
