@@ -1,4 +1,4 @@
-const weekDays = ["Sunday","Saturday","Monday","Tuesday","Wednesday","Thursday","Friday"]
+const weekDays = ["Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday"]
 
 function getWeekDayName(weekDay){
     return weekDays[weekDay];
